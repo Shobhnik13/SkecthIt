@@ -1,4 +1,3 @@
-declare var require:any
 
 const express=require('express')
 const app=express()
@@ -25,9 +24,21 @@ type Drawline={
 }
 
 io.on("connection", (socket) => {
+    socket.on('client-ready',()=>{
+        socket.broadcast.emit('get-canvas-state')
+      })
+  
+      socket.on('this-is-canvas-state',(state)=>{
+        socket.broadcast.emit('canvas-state-from-server',state) 
+      })
+
+
+    console.log('connected')
     socket.on('draw-line',({prevPoint,currentPoint,color}:Drawline)=>{
         socket.broadcast.emit('draw-line',{prevPoint,currentPoint,color})
     })
+
+    socket.on('clear',()=>io.emit('clear'))
   });
   
 server.listen(3001,()=>{
